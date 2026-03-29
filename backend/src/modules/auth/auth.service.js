@@ -168,7 +168,10 @@ export const verifyOtp = async ({
 };
 
 export const login = async ({ email, password }) => {
-  const user = await User.findOne({ email });
+  const emailNorm = String(email || "")
+    .toLowerCase()
+    .trim();
+  const user = await User.findOne({ email: emailNorm });
   if (!user) throw new Error("Invalid email or password");
 
   const isMatch = await comparePassword(password, user.password);

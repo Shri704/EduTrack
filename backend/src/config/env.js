@@ -14,6 +14,10 @@ const env = {
   BREVO_API_KEY: process.env.BREVO_API_KEY,
   BREVO_FROM_EMAIL: process.env.BREVO_FROM_EMAIL,
   BREVO_FROM_NAME: process.env.BREVO_FROM_NAME,
+  /** Optional: auto-create first superadmin on startup when DB has none (Render / Atlas). */
+  AUTO_SEED_SUPERADMIN: process.env.AUTO_SEED_SUPERADMIN,
+  SUPERADMIN_EMAIL: process.env.SUPERADMIN_EMAIL,
+  SUPERADMIN_PASSWORD: process.env.SUPERADMIN_PASSWORD,
   FRONTEND_URL: process.env.FRONTEND_URL || "http://localhost:5173",
   CAMPUS_LAT: process.env.CAMPUS_LAT
     ? Number(process.env.CAMPUS_LAT)

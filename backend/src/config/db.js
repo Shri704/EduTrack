@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import logger from "../utils/logger.js";
+import { ensureSuperAdminIfConfigured } from "../bootstrapAdmin.js";
 
 /** Trim and strip accidental quotes from .env (e.g. MONGO_URI="mongodb+srv://..."). */
 function normalizeMongoUri(raw) {
@@ -37,6 +38,8 @@ const connectDB = async () => {
     if (String(host).includes("mongodb.net")) {
       logger.info("MongoDB Atlas is connected.");
     }
+
+    await ensureSuperAdminIfConfigured();
   } catch (error) {
     const msg = String(error?.message || error);
     logger.error(`Database connection error: ${msg}`);

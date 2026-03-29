@@ -19,6 +19,7 @@ const Register = () => {
   });
   const [branches, setBranches] = useState([]);
   const [branchesLoading, setBranchesLoading] = useState(false);
+  const [branchesError, setBranchesError] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -28,11 +29,17 @@ const Register = () => {
     setBranchesLoading(true);
     const load = async () => {
       try {
-        const data = await fetchBranches();
-        const list = Array.isArray(data) ? data : data?.data || [];
+        setBranchesError("");
+        const list = await fetchBranches();
         if (!cancelled) setBranches(Array.isArray(list) ? list : []);
-      } catch {
-        if (!cancelled) setBranches([]);
+      } catch (err) {
+        console.error("[EduTrack] Failed to load branches:", err?.message || err);
+        if (!cancelled) {
+          setBranches([]);
+          setBranchesError(
+            "Could not load branches. Check that VITE_API_URL on Vercel points to your Render API (…/api) and redeploy."
+          );
+        }
       } finally {
         if (!cancelled) setBranchesLoading(false);
       }
@@ -212,6 +219,20 @@ const Register = () => {
                   </option>
                 ))}
               </select>
+              {branchesError ? (
+                <p className="text-xs text-rose-600 dark:text-rose-400">{branchesError}</p>
+              ) : null}
+              {!branchesLoading &&
+              !branchesError &&
+              branches.length === 0 ? (
+                <p className="text-xs text-amber-700 dark:text-amber-300">
+                  No branches in the database yet. Sign in as an admin → Branches to add them, or run{" "}
+                  <code className="rounded bg-slate-200 px-1 py-0.5 text-[0.7rem] dark:bg-slate-700">
+                    npm run seed:branches
+                  </code>{" "}
+                  on the server (same DB as production).
+                </p>
+              ) : null}
             </div>
 
             <div className="space-y-1 text-sm">

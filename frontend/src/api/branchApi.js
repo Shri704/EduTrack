@@ -1,8 +1,15 @@
 import apiClient from "./axios.js";
 
+/** Normalizes API `{ success, data: [...] }` to a plain array. */
+function unwrapBranchList(body) {
+  if (Array.isArray(body)) return body;
+  if (body && Array.isArray(body.data)) return body.data;
+  return [];
+}
+
 export const fetchBranches = async () => {
   const { data } = await apiClient.get("/branches");
-  return data.data || data;
+  return unwrapBranchList(data);
 };
 
 export const createBranch = async (payload) => {

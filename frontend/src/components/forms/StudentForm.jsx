@@ -10,10 +10,10 @@ const StudentForm = ({ initialData = {}, onSubmit, loading }) => {
     setBranchesLoading(true);
     const load = async () => {
       try {
-        const data = await fetchBranches();
-        const list = Array.isArray(data) ? data : data?.data || [];
+        const list = await fetchBranches();
         if (!cancelled) setBranches(Array.isArray(list) ? list : []);
-      } catch {
+      } catch (err) {
+        console.error("[EduTrack] Failed to load branches:", err?.message || err);
         if (!cancelled) setBranches([]);
       } finally {
         if (!cancelled) setBranchesLoading(false);

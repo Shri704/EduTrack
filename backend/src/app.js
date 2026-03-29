@@ -14,7 +14,13 @@ app.disable("etag");
 // Global Middleware
 // ----------------------------
 
-app.use(cors());
+// Allow browser requests from Vercel (or any origin) when API is on Render — required for cross-origin API calls.
+app.use(
+  cors({
+    origin: true,
+    credentials: true
+  })
+);
 
 app.use(express.json());
 

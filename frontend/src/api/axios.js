@@ -1,21 +1,20 @@
 import axios from "axios";
+import { getApiBaseURL } from "../config/apiBase.js";
 
-function resolveApiBaseURL() {
-  const raw =
-    typeof import.meta !== "undefined"
-      ? import.meta.env?.VITE_API_URL
-      : undefined;
-  const trimmed = raw != null ? String(raw).trim() : "";
-  if (trimmed) {
-    return trimmed.replace(/\/$/, "");
-  }
-  if (typeof window !== "undefined") {
-    return "/api";
-  }
-  return "http://127.0.0.1:5000/api";
+const baseURL = getApiBaseURL();
+
+if (
+  typeof import.meta !== "undefined" &&
+  import.meta.env?.PROD &&
+  typeof window !== "undefined" &&
+  baseURL === "/api"
+) {
+  console.warn(
+    "[EduTrack] VITE_API_URL is missing. Set it in Vercel → Environment Variables to your Render API URL (e.g. https://your-app.onrender.com/api), then redeploy."
+  );
 }
 
-const apiClient = axios.create({ baseURL: resolveApiBaseURL() });
+const apiClient = axios.create({ baseURL });
 
 apiClient.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {

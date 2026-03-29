@@ -1,4 +1,6 @@
-export const API_BASE_URL = "http://localhost:5000/api";
+import { getApiBaseURL } from "../config/apiBase.js";
+
+export const API_BASE_URL = getApiBaseURL();
 
 export const ROLES = {
   ADMIN: "admin",

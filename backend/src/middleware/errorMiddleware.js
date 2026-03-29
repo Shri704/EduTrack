@@ -1,6 +1,9 @@
 import logger from "../utils/logger.js";
+import { applyCorsHeaders } from "../config/corsOptions.js";
 
 export const errorHandler = (err, req, res, next) => {
+  applyCorsHeaders(req, res);
+
   let statusCode = err.statusCode || 500;
   let message = err.message || "Internal Server Error";
 

@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import routes from "./routes.js";
 
+import { applyCorsHeaders, corsOptions } from "./config/corsOptions.js";
 import { requestLogger } from "./middleware/loggerMiddleware.js";
 import { errorHandler } from "./middleware/errorMiddleware.js";
 
@@ -14,13 +15,8 @@ app.disable("etag");
 // Global Middleware
 // ----------------------------
 
-// Allow browser requests from Vercel (or any origin) when API is on Render — required for cross-origin API calls.
-app.use(
-  cors({
-    origin: true,
-    credentials: true
-  })
-);
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 
@@ -64,6 +60,7 @@ app.use("/api", routes);
 // ----------------------------
 
 app.use((req, res) => {
+  applyCorsHeaders(req, res);
   res.status(404).json({
     success: false,
     message: "Route not found"

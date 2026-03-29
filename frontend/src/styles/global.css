@@ -1,0 +1,42 @@
+html,
+body {
+  @apply min-h-dvh overflow-x-hidden bg-gradient-to-br from-slate-100 via-teal-50/20 to-cyan-50/25 text-slate-950 antialiased dark:from-slate-950 dark:via-slate-950 dark:to-slate-950 dark:text-slate-100;
+}
+
+body {
+  @apply font-sans;
+}
+
+a {
+  @apply text-teal-700 underline-offset-2 transition-[color,opacity] duration-200 dark:text-emerald-400;
+}
+
+a:hover {
+  @apply text-teal-900 opacity-90 dark:text-emerald-300;
+}
+
+.glass-panel {
+  @apply border border-teal-100/90 bg-white/85 backdrop-blur dark:border-slate-800/80 dark:bg-slate-900/60;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-teal-50/50 dark:bg-slate-950;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-teal-300/80 transition-colors hover:bg-teal-400 dark:bg-slate-700 dark:hover:bg-slate-500;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

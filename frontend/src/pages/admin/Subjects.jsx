@@ -132,7 +132,7 @@ const AdminSubjects = () => {
                       type="button"
                       onClick={() => handleDelete(s)}
                       disabled={deletingId === s._id}
-                      className="rounded-lg border border-rose-500/40 bg-rose-500/10 px-2.5 py-1 text-[11px] font-semibold text-rose-200 transition hover:bg-rose-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="rounded-lg border border-rose-500/40 bg-rose-500/10 px-2.5 py-1 text-[11px] font-semibold text-rose-800 transition hover:bg-rose-500/20 dark:text-rose-200 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {deletingId === s._id ? "Deleting…" : "Delete"}
                     </button>

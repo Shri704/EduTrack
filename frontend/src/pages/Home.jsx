@@ -238,7 +238,7 @@ const Home = () => {
               </span>
               <Link
                 to={dashboardTo}
-                className="relative overflow-hidden rounded-full bg-gradient-to-r from-teal-500 via-emerald-400 to-cyan-400 px-4 py-2 text-xs font-bold text-white shadow-[0_10px_30px_-12px_rgba(13,148,136,0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-12px_rgba(13,148,136,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/55 focus-visible:ring-offset-2 dark:from-emerald-400 dark:via-cyan-400 dark:to-sky-400 dark:text-slate-950"
+                className="relative overflow-hidden rounded-full bg-gradient-to-r from-teal-500 via-emerald-400 to-cyan-400 px-4 py-2 text-xs font-bold text-white shadow-[0_10px_30px_-12px_rgba(13,148,136,0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_40px_-12px_rgba(13,148,136,0.55)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/55 focus-visible:ring-offset-2 dark:from-emerald-400 dark:via-cyan-400 dark:to-sky-400 dark:text-white"
               >
                 Dashboard
               </Link>
@@ -419,7 +419,7 @@ const Home = () => {
               {user && dashboardTo ? (
                 <Link
                   to={dashboardTo}
-                  className="group relative inline-flex w-full min-h-[3rem] items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-400 via-cyan-400 to-sky-400 px-7 py-3.5 text-sm font-bold text-slate-950 shadow-[0_14px_36px_-16px_rgba(16,185,129,0.8)] transition-all duration-300 active:scale-[0.98] motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-[0_20px_50px_-16px_rgba(16,185,129,1)] sm:w-auto"
+                  className="group relative inline-flex w-full min-h-[3rem] items-center justify-center gap-2 overflow-hidden rounded-2xl bg-gradient-to-r from-emerald-400 via-cyan-400 to-sky-400 px-7 py-3.5 text-sm font-bold text-white shadow-[0_14px_36px_-16px_rgba(16,185,129,0.8)] transition-all duration-300 active:scale-[0.98] motion-safe:hover:-translate-y-0.5 motion-safe:hover:shadow-[0_20px_50px_-16px_rgba(16,185,129,1)] sm:w-auto dark:text-white"
                 >
                   <span className="relative z-10">Go to your dashboard</span>
                   <svg className="relative z-10 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

@@ -24,11 +24,7 @@ export const updateCourse = async (id, data) => {
 };
 
 export const deleteCourse = async (id) => {
-  const c = await Course.findByIdAndUpdate(
-    id,
-    { isActive: false },
-    { new: true }
-  );
+  const c = await Course.findByIdAndDelete(id);
   if (!c) throw new Error("Course not found");
-  return { message: "Course deleted" };
+  return { message: "Course deleted permanently" };
 };

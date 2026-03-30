@@ -117,8 +117,14 @@ export const assignSubject = async (teacherId, subjectId) => {
 };
 
 export const deleteTeacher = async (id) => {
-  const teacher = await Teacher.findByIdAndUpdate(id, { isActive: false }, { new: true });
-  if (!teacher) throw new Error('Teacher not found');
-  return { message: 'Teacher deleted successfully' };
+  const teacher = await Teacher.findById(id).select("_id user").lean();
+  if (!teacher) throw new Error("Teacher not found");
+
+  // Hard delete the teacher profile and its user account.
+  await Teacher.deleteOne({ _id: teacher._id });
+  if (teacher.user) {
+    await User.deleteOne({ _id: teacher.user, role: "teacher" });
+  }
+  return { message: "Teacher deleted permanently" };
 };
 

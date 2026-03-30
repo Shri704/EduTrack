@@ -521,12 +521,8 @@ const StudentAttendance = () => {
             <table className="edu-table-text w-max min-w-full">
               <thead className="edu-thead">
                 <tr>
-                  <th className="sticky left-0 z-20 w-[96px] min-w-[96px] max-w-[96px] bg-slate-100 p-0 shadow-[1px_0_0_0_rgb(226,232,240)] dark:bg-slate-900/80 dark:shadow-[1px_0_0_0_rgba(30,41,59,0.8)]">
-                    <span className="block px-3 py-3">Roll</span>
-                  </th>
-                  <th className="sticky left-[96px] z-20 w-[200px] min-w-[200px] max-w-[200px] bg-slate-100 p-0 shadow-[1px_0_0_0_rgb(226,232,240)] dark:bg-slate-900/80 dark:shadow-[1px_0_0_0_rgba(30,41,59,0.8)]">
-                    <span className="block px-3 py-3">Name</span>
-                  </th>
+                  <th className="px-3 py-3">Roll</th>
+                  <th className="px-3 py-3">Name</th>
                   {dailyDates.map((d) => (
                     <th key={d} className="min-w-[96px] px-3 py-3 text-center">
                       {d}
@@ -536,13 +532,11 @@ const StudentAttendance = () => {
               </thead>
               <tbody>
                 <tr className="edu-tr">
-                  <td className="sticky left-0 z-10 w-[96px] min-w-[96px] max-w-[96px] bg-white p-0 text-sm font-semibold text-slate-900 shadow-[1px_0_0_0_rgb(226,232,240)] dark:text-sm dark:font-normal dark:text-slate-400 dark:bg-slate-950/60 dark:shadow-[1px_0_0_0_rgba(30,41,59,0.8)]">
-                    <span className="block px-3 py-2.5 truncate">
-                      {displayRoll}
-                    </span>
+                  <td className="px-3 py-2.5 text-sm font-semibold text-slate-900 dark:text-sm dark:font-normal dark:text-slate-400">
+                    {displayRoll}
                   </td>
-                  <td className="sticky left-[96px] z-10 w-[200px] min-w-[200px] max-w-[200px] bg-white p-0 text-sm font-semibold text-slate-900 shadow-[1px_0_0_0_rgb(226,232,240)] dark:text-sm dark:font-normal dark:text-slate-300 dark:bg-slate-950/60 dark:shadow-[1px_0_0_0_rgba(30,41,59,0.8)]">
-                    <span className="block px-3 py-2.5 truncate">
+                  <td className="px-3 py-2.5 text-sm font-semibold text-slate-900 dark:text-sm dark:font-normal dark:text-slate-300">
+                    <span className="block min-w-[12.5rem] truncate">
                       {displayName}
                     </span>
                   </td>

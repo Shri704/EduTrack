@@ -451,12 +451,8 @@ const TeacherDashboard = () => {
                   <table className="edu-table-text w-max min-w-full">
                     <thead className="edu-thead">
                       <tr>
-                        <th className="sticky left-0 z-20 w-[96px] min-w-[96px] max-w-[96px] bg-slate-100 p-0 shadow-[1px_0_0_0_rgb(226,232,240)] dark:bg-slate-900/80 dark:shadow-[1px_0_0_0_rgba(30,41,59,0.8)]">
-                          <span className="block px-3 py-3">Roll</span>
-                        </th>
-                        <th className="sticky left-[96px] z-20 w-[200px] min-w-[200px] max-w-[200px] bg-slate-100 p-0 shadow-[1px_0_0_0_rgb(226,232,240)] dark:bg-slate-900/80 dark:shadow-[1px_0_0_0_rgba(30,41,59,0.8)]">
-                          <span className="block px-3 py-3">Name</span>
-                        </th>
+                        <th className="px-3 py-3">Roll</th>
+                        <th className="px-3 py-3">Name</th>
                         {report.dates.map((d) => (
                           <th key={d} className="min-w-[96px] px-3 py-3 text-center">
                             {d}
@@ -470,13 +466,11 @@ const TeacherDashboard = () => {
                           key={r.student?._id || i}
                           className="edu-tr"
                         >
-                          <td className="sticky left-0 z-10 w-[96px] min-w-[96px] max-w-[96px] bg-white p-0 text-slate-600 shadow-[1px_0_0_0_rgb(226,232,240)] dark:bg-slate-950/60 dark:text-slate-400 dark:shadow-[1px_0_0_0_rgba(30,41,59,0.8)]">
-                            <span className="block px-3 py-2.5 truncate">
-                              {r.student?.rollNumber || "—"}
-                            </span>
+                          <td className="px-3 py-2.5 text-slate-600 dark:text-slate-400">
+                            {r.student?.rollNumber || "—"}
                           </td>
-                          <td className="sticky left-[96px] z-10 w-[200px] min-w-[200px] max-w-[200px] bg-white p-0 shadow-[1px_0_0_0_rgb(226,232,240)] dark:bg-slate-950/60 dark:shadow-[1px_0_0_0_rgba(30,41,59,0.8)]">
-                            <span className="block px-3 py-2.5 truncate">
+                          <td className="px-3 py-2.5">
+                            <span className="block min-w-[12.5rem] truncate">
                               {String(r.student?.name || "—").replace(/\s+User\s*$/i, "").trim() || "—"}
                             </span>
                           </td>

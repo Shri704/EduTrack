@@ -158,14 +158,8 @@ const TeacherHolidays = () => {
           <input
             type="date"
             value={date}
-            max={today}
             onChange={(e) => {
               const v = e.target.value;
-              if (v && v > today) {
-                toast.error("Cannot set a future holiday date.");
-                setDate(today);
-                return;
-              }
               setDate(v);
             }}
             required

@@ -1,10 +1,29 @@
 function resolveCourseLabel(student, branches) {
   const list = Array.isArray(branches) ? branches : [];
 
+  const abbrevFromText = (txt) => {
+    const s = String(txt || "").trim();
+    if (!s) return "";
+    const lower = s.toLowerCase();
+    if (lower === "computer science" || lower.includes("computer science")) return "CSE";
+    if (lower.includes("artificial intelligence") && lower.includes("machine learning")) return "AIML";
+    if (lower.includes("information science")) return "ISE";
+    if (lower.includes("electronics") && lower.includes("communication")) return "ECE";
+    if (lower.includes("electrical") && lower.includes("electronics")) return "EEE";
+    if (lower.includes("mechanical")) return "ME";
+    if (lower.includes("civil")) return "CE";
+    const tokens = s
+      .replace(/[^a-z0-9\s]/gi, " ")
+      .split(/\s+/)
+      .filter(Boolean);
+    const letters = tokens.map((w) => w[0]).join("");
+    return letters ? letters.toUpperCase() : "";
+  };
+
   const branchId = student?.courseId || student?.course?._id;
   if (branchId) {
     const b = list.find((x) => String(x?._id) === String(branchId));
-    if (b) return `${b.code || b.name}${b.code && b.name ? ` · ${b.name}` : ""}`;
+    if (b) return String(b.code || abbrevFromText(b.name) || b.name || "—");
   }
 
   const label = String(student?.branch || "").trim();
@@ -13,14 +32,14 @@ function resolveCourseLabel(student, branches) {
   const byCode = list.find(
     (b) => b?.code && String(b.code).trim().toLowerCase() === label.toLowerCase()
   );
-  if (byCode) return `${byCode.code}${byCode.name ? ` · ${byCode.name}` : ""}`;
+  if (byCode) return String(byCode.code || "—");
 
   const byName = list.find(
     (b) => b?.name && String(b.name).trim().toLowerCase() === label.toLowerCase()
   );
-  if (byName) return `${byName.code || byName.name}`;
+  if (byName) return String(byName.code || abbrevFromText(byName.name) || byName.name || "—");
 
-  return label;
+  return abbrevFromText(label) || label;
 }
 
 const StudentTable = ({ students = [], branches = [], onEdit, onDelete }) => {

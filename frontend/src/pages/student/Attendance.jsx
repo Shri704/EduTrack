@@ -503,7 +503,7 @@ const StudentAttendance = () => {
           .
         </div>
       ) : canShowDaily && dailyDates.length > 0 ? (
-        <div className="edu-table-wrap overflow-hidden rounded-2xl">
+        <div className="edu-table-wrap rounded-2xl">
           <div className="flex flex-col gap-1 border-b border-slate-200 px-3 py-2.5 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-3">
             <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-slate-800 dark:font-semibold dark:text-slate-400 sm:text-xs sm:tracking-[0.2em]">
@@ -521,10 +521,10 @@ const StudentAttendance = () => {
             <table className="edu-table-text w-max min-w-full">
               <thead className="edu-thead">
                 <tr>
-                  <th className="sticky left-0 z-20 bg-slate-100 px-3 py-3 shadow-[1px_0_0_0_rgb(226,232,240)] dark:bg-slate-900/80 dark:shadow-[1px_0_0_0_rgba(30,41,59,0.8)]">
+                  <th className="sticky left-0 z-20 w-[72px] min-w-[72px] max-w-[72px] bg-slate-100 px-3 py-3 shadow-[1px_0_0_0_rgb(226,232,240)] dark:bg-slate-900/80 dark:shadow-[1px_0_0_0_rgba(30,41,59,0.8)]">
                     Roll
                   </th>
-                  <th className="sticky left-[72px] z-20 bg-slate-100 px-3 py-3 shadow-[1px_0_0_0_rgb(226,232,240)] dark:bg-slate-900/80 dark:shadow-[1px_0_0_0_rgba(30,41,59,0.8)]">
+                  <th className="sticky left-[72px] z-20 w-[160px] min-w-[160px] max-w-[160px] bg-slate-100 px-3 py-3 shadow-[1px_0_0_0_rgb(226,232,240)] dark:bg-slate-900/80 dark:shadow-[1px_0_0_0_rgba(30,41,59,0.8)]">
                     Name
                   </th>
                   {dailyDates.map((d) => (

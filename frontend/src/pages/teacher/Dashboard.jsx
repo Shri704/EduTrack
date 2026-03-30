@@ -451,10 +451,10 @@ const TeacherDashboard = () => {
                   <table className="edu-table-text w-max min-w-full">
                     <thead className="edu-thead">
                       <tr>
-                        <th className="sticky left-0 z-20 bg-slate-100 px-3 py-3 shadow-[1px_0_0_0_rgb(226,232,240)] dark:bg-slate-900/80 dark:shadow-[1px_0_0_0_rgba(30,41,59,0.8)]">
+                        <th className="sticky left-0 z-20 w-[72px] min-w-[72px] max-w-[72px] bg-slate-100 px-3 py-3 shadow-[1px_0_0_0_rgb(226,232,240)] dark:bg-slate-900/80 dark:shadow-[1px_0_0_0_rgba(30,41,59,0.8)]">
                           Roll
                         </th>
-                        <th className="sticky left-[72px] z-20 bg-slate-100 px-3 py-3 shadow-[1px_0_0_0_rgb(226,232,240)] dark:bg-slate-900/80 dark:shadow-[1px_0_0_0_rgba(30,41,59,0.8)]">
+                        <th className="sticky left-[72px] z-20 w-[160px] min-w-[160px] max-w-[160px] bg-slate-100 px-3 py-3 shadow-[1px_0_0_0_rgb(226,232,240)] dark:bg-slate-900/80 dark:shadow-[1px_0_0_0_rgba(30,41,59,0.8)]">
                           Name
                         </th>
                         {report.dates.map((d) => (

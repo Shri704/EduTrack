@@ -4,7 +4,7 @@ import AdminStudents from "../admin/Students.jsx";
 // but this keeps the demo UI consistent and functional).
 
 const TeacherStudents = () => {
-  return <AdminStudents />;
+  return <AdminStudents hidePromote />;
 };
 
 export default TeacherStudents;

@@ -1,4 +1,29 @@
-const StudentTable = ({ students = [], onEdit, onDelete }) => {
+function resolveCourseLabel(student, branches) {
+  const list = Array.isArray(branches) ? branches : [];
+
+  const branchId = student?.courseId || student?.course?._id;
+  if (branchId) {
+    const b = list.find((x) => String(x?._id) === String(branchId));
+    if (b) return `${b.code || b.name}${b.code && b.name ? ` · ${b.name}` : ""}`;
+  }
+
+  const label = String(student?.branch || "").trim();
+  if (!label) return "—";
+
+  const byCode = list.find(
+    (b) => b?.code && String(b.code).trim().toLowerCase() === label.toLowerCase()
+  );
+  if (byCode) return `${byCode.code}${byCode.name ? ` · ${byCode.name}` : ""}`;
+
+  const byName = list.find(
+    (b) => b?.name && String(b.name).trim().toLowerCase() === label.toLowerCase()
+  );
+  if (byName) return `${byName.code || byName.name}`;
+
+  return label;
+}
+
+const StudentTable = ({ students = [], branches = [], onEdit, onDelete }) => {
   return (
     <div className="edu-table-wrap overflow-x-auto">
       <table className="edu-table-text min-w-full">
@@ -33,8 +58,8 @@ const StudentTable = ({ students = [], onEdit, onDelete }) => {
               </td>
               <td className="px-4 py-2.5">{s.email}</td>
               <td className="px-4 py-2.5">{s.rollNumber}</td>
-              <td className="px-4 py-2.5 text-slate-400">
-                {s.courseId}
+              <td className="px-4 py-2.5 text-slate-700 dark:text-slate-300">
+                {resolveCourseLabel(s, branches)}
               </td>
               <td className="px-4 py-2.5">{s.semester}</td>
               <td className="px-4 py-2.5 text-right whitespace-nowrap min-w-[140px]">

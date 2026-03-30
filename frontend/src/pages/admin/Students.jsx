@@ -11,7 +11,7 @@ import { fetchBranches } from "../../api/branchApi.js";
 import StudentForm from "../../components/forms/StudentForm.jsx";
 import StudentTable from "../../components/tables/StudentTable.jsx";
 
-const AdminStudents = () => {
+const AdminStudents = ({ hidePromote = false } = {}) => {
   const [students, setStudents] = useState([]);
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -355,80 +355,94 @@ const AdminStudents = () => {
         </div>
       </form>
 
-      <div className="edu-card-soft border border-teal-200/80 p-4 dark:border-teal-500/20">
-        <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-          Promote students
-        </h3>
-        <p className="edu-muted mt-1 text-xs leading-relaxed">
-          Moves everyone in the selected <strong className="font-medium text-slate-800 dark:text-slate-200">branch</strong> and{" "}
-          <strong className="font-medium text-slate-800 dark:text-slate-200">current semester</strong> up by one (e.g. semester 1 → 2, 2 → 3).
-          Enter one or more <strong className="font-medium text-slate-800 dark:text-slate-200">roll numbers to exclude</strong> — those students stay in the same semester; all others in that cohort are promoted.
-          Students already in semester 8 are skipped.
-        </p>
-        <form
-          onSubmit={handlePromote}
-          className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
-        >
-          <div className="space-y-1">
-            <label className="edu-muted block text-xs">Branch</label>
-            <select
-              value={promoteBranch}
-              onChange={(e) => setPromoteBranch(e.target.value)}
-              className="edu-input"
-              required
-            >
-              <option value="">Select branch</option>
-              {branchesLoading ? (
-                <option value="" disabled>
-                  Loading...
-                </option>
-              ) : (
-                branches.map((b) => (
-                  <option key={b._id} value={b._id}>
-                    {b.name} {b.code ? `(${b.code})` : ""}
+      {!hidePromote ? (
+        <div className="edu-card-soft border border-teal-200/80 p-4 dark:border-teal-500/20">
+          <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+            Promote students
+          </h3>
+          <p className="edu-muted mt-1 text-xs leading-relaxed">
+            Moves everyone in the selected{" "}
+            <strong className="font-medium text-slate-800 dark:text-slate-200">
+              branch
+            </strong>{" "}
+            and{" "}
+            <strong className="font-medium text-slate-800 dark:text-slate-200">
+              current semester
+            </strong>{" "}
+            up by one (e.g. semester 1 → 2, 2 → 3). Enter one or more{" "}
+            <strong className="font-medium text-slate-800 dark:text-slate-200">
+              roll numbers to exclude
+            </strong>{" "}
+            — those students stay in the same semester; all others in that cohort
+            are promoted. Students already in semester 8 are skipped.
+          </p>
+          <form
+            onSubmit={handlePromote}
+            className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+          >
+            <div className="space-y-1">
+              <label className="edu-muted block text-xs">Branch</label>
+              <select
+                value={promoteBranch}
+                onChange={(e) => setPromoteBranch(e.target.value)}
+                className="edu-input"
+                required
+              >
+                <option value="">Select branch</option>
+                {branchesLoading ? (
+                  <option value="" disabled>
+                    Loading...
                   </option>
-                ))
-              )}
-            </select>
-          </div>
-          <div className="space-y-1">
-            <label className="edu-muted block text-xs">Current semester (cohort)</label>
-            <select
-              value={promoteSemester}
-              onChange={(e) => setPromoteSemester(e.target.value)}
-              className="edu-input"
-              required
-            >
-              <option value="">Select semester</option>
-              {[1, 2, 3, 4, 5, 6, 7].map((s) => (
-                <option key={s} value={s}>
-                  Semester {s} → {s + 1}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-1 sm:col-span-2 lg:col-span-2">
-            <label className="edu-muted block text-xs">
-              Exclude roll number(s) (optional)
-            </label>
-            <input
-              value={excludeRolls}
-              onChange={(e) => setExcludeRolls(e.target.value)}
-              placeholder="e.g. 101 or 101, 102 103"
-              className="edu-input"
-            />
-          </div>
-          <div className="flex items-end sm:col-span-2 lg:col-span-4">
-            <button
-              type="submit"
-              disabled={promoteLoading}
-              className="rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-teal-900/20 disabled:opacity-60 dark:from-teal-500 dark:to-emerald-500"
-            >
-              {promoteLoading ? "Promoting…" : "Promote cohort to next semester"}
-            </button>
-          </div>
-        </form>
-      </div>
+                ) : (
+                  branches.map((b) => (
+                    <option key={b._id} value={b._id}>
+                      {b.name} {b.code ? `(${b.code})` : ""}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+            <div className="space-y-1">
+              <label className="edu-muted block text-xs">
+                Current semester (cohort)
+              </label>
+              <select
+                value={promoteSemester}
+                onChange={(e) => setPromoteSemester(e.target.value)}
+                className="edu-input"
+                required
+              >
+                <option value="">Select semester</option>
+                {[1, 2, 3, 4, 5, 6, 7].map((s) => (
+                  <option key={s} value={s}>
+                    Semester {s} → {s + 1}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1 sm:col-span-2 lg:col-span-2">
+              <label className="edu-muted block text-xs">
+                Exclude roll number(s) (optional)
+              </label>
+              <input
+                value={excludeRolls}
+                onChange={(e) => setExcludeRolls(e.target.value)}
+                placeholder="e.g. 101 or 101, 102 103"
+                className="edu-input"
+              />
+            </div>
+            <div className="flex items-end sm:col-span-2 lg:col-span-4">
+              <button
+                type="submit"
+                disabled={promoteLoading}
+                className="rounded-xl bg-gradient-to-r from-teal-600 to-emerald-600 px-4 py-2.5 text-xs font-semibold text-white shadow-md shadow-teal-900/20 disabled:opacity-60 dark:from-teal-500 dark:to-emerald-500"
+              >
+                {promoteLoading ? "Promoting…" : "Promote cohort to next semester"}
+              </button>
+            </div>
+          </form>
+        </div>
+      ) : null}
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,2fr)]">
         <StudentForm
@@ -438,6 +452,7 @@ const AdminStudents = () => {
         />
         <StudentTable
           students={students}
+          branches={branches}
           onEdit={setSelected}
           onDelete={handleDelete}
         />

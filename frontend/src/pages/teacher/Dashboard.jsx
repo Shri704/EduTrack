@@ -215,13 +215,15 @@ const TeacherDashboard = () => {
     e.preventDefault();
     setError("");
     setReport(null);
-    if (!branch || !semester || !subject) {
-      setError("Please select branch, semester, and subject.");
+    const effectiveSubjectId =
+      subject || (Array.isArray(subjects) && subjects[0]?._id ? subjects[0]._id : null);
+    if (!branch || !semester || !effectiveSubjectId) {
+      setError("Please select branch and semester (and ensure subjects exist).");
       return;
     }
     setLoading(true);
     try {
-      const params = { branch, semester, subject };
+      const params = { branch, semester, subject: effectiveSubjectId };
       if (startDate && endDate) {
         params.startDate = startDate;
         params.endDate = endDate;
@@ -381,7 +383,6 @@ const TeacherDashboard = () => {
               <select
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                required
                 className="edu-input"
               >
                 <option value="">
@@ -454,7 +455,10 @@ const TeacherDashboard = () => {
                         <th className="px-3 py-3">Roll</th>
                         <th className="px-3 py-3">Name</th>
                         {report.dates.map((d) => (
-                          <th key={d} className="min-w-[96px] px-3 py-3 text-center">
+                          <th
+                            key={d}
+                            className="min-w-[82px] sm:min-w-[96px] px-3 py-3 text-center"
+                          >
                             {d}
                           </th>
                         ))}
@@ -470,7 +474,7 @@ const TeacherDashboard = () => {
                             {r.student?.rollNumber || "—"}
                           </td>
                           <td className="px-3 py-2.5">
-                            <span className="block min-w-[12.5rem] truncate">
+                            <span className="block max-w-[9.25rem] truncate sm:max-w-[12.5rem]">
                               {String(r.student?.name || "—").replace(/\s+User\s*$/i, "").trim() || "—"}
                             </span>
                           </td>
@@ -482,7 +486,10 @@ const TeacherDashboard = () => {
                             const holiday = status === "holiday";
                             const letter = attendanceStatusLetter(status);
                             return (
-                              <td key={d} className="min-w-[96px] px-3 py-2.5 text-center">
+                              <td
+                                key={d}
+                                className="min-w-[82px] sm:min-w-[96px] px-3 py-2.5 text-center"
+                              >
                                 <span
                                   className={`inline-flex min-w-[1.5rem] items-center justify-center rounded-md border px-1.5 py-0.5 text-[11px] font-semibold ${
                                     holiday

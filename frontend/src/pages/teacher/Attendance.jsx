@@ -120,12 +120,16 @@ const TeacherAttendance = () => {
     setSaving(true);
     setMessage("");
     try {
-      if (!branch || !semester || !subjectId) {
-        throw new Error("Please select branch, semester, and subject.");
+      const effectiveSubjectId =
+        subjectId || (Array.isArray(subjects) && subjects[0]?._id ? subjects[0]._id : null);
+      if (!branch || !semester || !effectiveSubjectId) {
+        throw new Error(
+          "Please select branch and semester (and ensure subjects exist)."
+        );
       }
       const records = rows.map((r) => ({
         student: r.studentId,
-        subject: subjectId,
+        subject: effectiveSubjectId,
         date,
         status: r.status
       }));
@@ -188,7 +192,6 @@ const TeacherAttendance = () => {
           <select
             value={subjectId}
             onChange={(e) => setSubjectId(e.target.value)}
-            required
             disabled={!branch || !semester || loadingSubjects}
             className="edu-input disabled:opacity-60"
           >
@@ -210,14 +213,8 @@ const TeacherAttendance = () => {
           <input
             type="date"
             value={date}
-            max={today}
             onChange={(e) => {
               const v = e.target.value;
-              if (v && v > today) {
-                toast.error("You can't mark attendance for future dates.");
-                setDate(today);
-                return;
-              }
               setDate(v);
             }}
             required

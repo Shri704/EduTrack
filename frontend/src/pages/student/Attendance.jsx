@@ -524,7 +524,10 @@ const StudentAttendance = () => {
                   <th className="px-3 py-3">Roll</th>
                   <th className="px-3 py-3">Name</th>
                   {dailyDates.map((d) => (
-                    <th key={d} className="min-w-[96px] px-3 py-3 text-center">
+                    <th
+                      key={d}
+                      className="min-w-[82px] sm:min-w-[96px] px-3 py-3 text-center"
+                    >
                       {d}
                     </th>
                   ))}
@@ -536,7 +539,7 @@ const StudentAttendance = () => {
                     {displayRoll}
                   </td>
                   <td className="px-3 py-2.5 text-sm font-semibold text-slate-900 dark:text-sm dark:font-normal dark:text-slate-300">
-                    <span className="block min-w-[12.5rem] truncate">
+                    <span className="block max-w-[9.25rem] truncate sm:max-w-[12.5rem]">
                       {displayName}
                     </span>
                   </td>
@@ -547,7 +550,10 @@ const StudentAttendance = () => {
                     const late = status === "late";
                     const holiday = status === "holiday";
                     return (
-                      <td key={d} className="min-w-[96px] px-3 py-2.5 text-center">
+                        <td
+                          key={d}
+                          className="min-w-[82px] sm:min-w-[96px] px-3 py-2.5 text-center"
+                        >
                         {!hasRecord ? (
                           <span
                             className="text-[11px] font-semibold text-slate-700 dark:font-normal dark:text-slate-600"

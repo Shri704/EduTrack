@@ -219,10 +219,11 @@ export async function removeHolidayForCourse({
       const subIds = subjects.map((s) => s._id);
 
       if (subIds.length) {
-        await Attendance.updateMany(
-          { subject: { $in: subIds }, date: day, status: "holiday" },
-          { $set: { status: "absent", remarks: "" } }
-        );
+        await Attendance.deleteMany({
+          subject: { $in: subIds },
+          date: day,
+          status: "holiday"
+        });
       }
     } else {
       await Holiday.deleteOne({
@@ -232,10 +233,7 @@ export async function removeHolidayForCourse({
         subject: subjectId
       });
 
-      await Attendance.updateMany(
-        { subject: subjectId, date: day, status: "holiday" },
-        { $set: { status: "absent", remarks: "" } }
-      );
+      await Attendance.deleteMany({ subject: subjectId, date: day, status: "holiday" });
     }
   } else {
     await Holiday.deleteMany({ course: courseId, date: day, semester: semNum });
@@ -249,10 +247,11 @@ export async function removeHolidayForCourse({
     if (!subIds.length) {
       return { message: "Holiday removed" };
     }
-    await Attendance.updateMany(
-      { subject: { $in: subIds }, date: day, status: "holiday" },
-      { $set: { status: "absent", remarks: "" } }
-    );
+    await Attendance.deleteMany({
+      subject: { $in: subIds },
+      date: day,
+      status: "holiday"
+    });
   }
-  return { message: "Holiday removed; attendance reset to absent" };
+  return { message: "Holiday removed; holiday rows cleared" };
 }

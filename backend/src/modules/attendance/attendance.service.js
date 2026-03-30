@@ -1,6 +1,9 @@
 import Attendance from "./attendance.model.js";
 import Student from "../students/student.model.js";
 import { resolveProgramSubjectIds } from "../reports/report.service.js";
+import Holiday from "../holidays/holiday.model.js";
+import Subject from "../subjects/subject.model.js";
+import { normalizeDayLocal } from "../holidays/holiday.service.js";
 import {
   attendanceRowsForPercentage,
   countPresentForStats
@@ -58,6 +61,54 @@ export const markAttendance = async (records) => {
       throw new Error(
         "Use the Holidays screen to mark branch holidays; status cannot be holiday here"
       );
+    }
+  }
+
+  // If a subject/day is a holiday, don't allow attendance marking to overwrite it.
+  // Otherwise it would start counting toward "classes taken".
+  const uniquePairs = Array.from(
+    new Map(
+      normalized
+        .filter((r) => r?.subject && r?.date)
+        .map((r) => [`${String(r.subject)}|${r.date.toISOString()}`, { subject: r.subject, date: r.date }])
+    ).values()
+  );
+
+  if (uniquePairs.length) {
+    // Block if any existing attendance row is already holiday.
+    const existingHoliday = await Attendance.findOne({
+      $or: uniquePairs.map((p) => ({
+        subject: p.subject,
+        date: p.date,
+        status: "holiday"
+      }))
+    })
+      .select("_id")
+      .lean();
+    if (existingHoliday) {
+      throw new Error("This date is marked as a holiday for the selected subject.");
+    }
+
+    // Block if holiday is recorded (subject-specific or course-level).
+    const subjectIds = uniquePairs.map((p) => String(p.subject));
+    const subjects = await Subject.find({ _id: { $in: subjectIds } })
+      .select("_id course semester")
+      .lean();
+    const byId = new Map(subjects.map((s) => [String(s._id), s]));
+
+    for (const p of uniquePairs) {
+      const s = byId.get(String(p.subject));
+      if (!s) continue;
+      const day = normalizeDayLocal(p.date);
+      const hol = await Holiday.exists({
+        course: s.course,
+        semester: Number(s.semester),
+        date: day,
+        $or: [{ subject: s._id }, { subject: null }]
+      });
+      if (hol) {
+        throw new Error("This date is marked as a holiday for the selected subject.");
+      }
     }
   }
 

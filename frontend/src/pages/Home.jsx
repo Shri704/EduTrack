@@ -542,7 +542,7 @@ const Home = () => {
                             animationDelay: `${0.8 + i * 0.1}s`,
                           }}
                         />
-                        <span className="text-[8px] text-slate-500 dark:text-slate-600">
+                        <span className="text-[8px] text-slate-500 dark:text-slate-400">
                           {["M", "T", "W", "T", "F", "S", "S"][i]}
                         </span>
                       </div>
@@ -772,7 +772,7 @@ const Home = () => {
             </section>
           </div>
 
-          <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200/60 pt-8 text-[11px] text-slate-500 sm:flex-row dark:border-slate-800/60 dark:text-slate-600">
+          <div className="mt-10 flex flex-col items-center justify-between gap-4 border-t border-slate-200/60 pt-8 text-[11px] text-slate-500 sm:flex-row dark:border-slate-800/60 dark:text-slate-400">
             <p>© {new Date().getFullYear()} EduTrack. Built for educators, by technologists.</p>
             <p className="text-center sm:text-right">Teal · cyan · calm analytics</p>
           </div>

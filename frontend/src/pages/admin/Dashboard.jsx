@@ -293,20 +293,36 @@ const AdminDashboard = () => {
             Semester health
           </h2>
           <ul className="mt-3 space-y-2.5 text-sm text-slate-600 dark:text-slate-400">
-            <li className="flex gap-2">
+            <li className="flex items-start gap-2 text-left">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
-              Align <strong className="font-medium text-slate-800 dark:text-slate-200">branches</strong>{" "}
-              and <strong className="font-medium text-slate-800 dark:text-slate-200">subjects</strong>{" "}
-              before teachers schedule classes.
+              <p className="min-w-0 flex-1">
+                Align{" "}
+                <strong className="font-medium text-slate-800 dark:text-slate-200">
+                  branches
+                </strong>{" "}
+                and{" "}
+                <strong className="font-medium text-slate-800 dark:text-slate-200">
+                  subjects
+                </strong>{" "}
+                before teachers schedule classes.
+              </p>
             </li>
-            <li className="flex gap-2">
+            <li className="flex items-start gap-2 text-left">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-500" />
-              Pull <strong className="font-medium text-slate-800 dark:text-slate-200">reports</strong>{" "}
-              before midterms to catch attendance gaps early.
+              <p className="min-w-0 flex-1">
+                Pull{" "}
+                <strong className="font-medium text-slate-800 dark:text-slate-200">
+                  reports
+                </strong>{" "}
+                before midterms to catch attendance gaps early.
+              </p>
             </li>
-            <li className="flex gap-2">
+            <li className="flex items-start gap-2 text-left">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-teal-500" />
-              Nudge teachers to stay current on attendance and marks so student dashboards stay trustworthy.
+              <p className="min-w-0 flex-1">
+                Nudge teachers to stay current on attendance and marks so student
+                dashboards stay trustworthy.
+              </p>
             </li>
           </ul>
         </div>

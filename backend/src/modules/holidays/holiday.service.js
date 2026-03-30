@@ -39,6 +39,7 @@ export async function createHolidayForCourse({
   courseId,
   semester,
   date,
+  subjectId = null,
   userId,
   userRole,
   note = ""
@@ -66,13 +67,49 @@ export async function createHolidayForCourse({
     }
   }
 
+  let subjects;
+  if (subjectId) {
+    if (!mongoose.isValidObjectId(String(subjectId))) {
+      throw new Error("Invalid subject id");
+    }
+    const s = await Subject.findById(subjectId)
+      .select("_id course semester")
+      .lean();
+    if (
+      !s ||
+      String(s.course) !== String(courseId) ||
+      Number(s.semester) !== semNum
+    ) {
+      throw new Error("Subject not found for given branch and semester");
+    }
+
+    // If teacher role: also ensure they teach this exact subject.
+    if (!isAdmin && teacherDoc?.subjects?.length) {
+      const canThisSubject = teacherDoc.subjects.some((x) => {
+        const v = typeof x === "object" ? x?._id ?? x : x;
+        return String(v) === String(subjectId);
+      });
+      if (!canThisSubject) {
+        throw new Error("You are not assigned to teach this subject");
+      }
+    }
+    subjects = [s];
+  } else {
+    subjects = await Subject.find({
+      course: courseId,
+      semester: semNum,
+      isActive: { $ne: false }
+    }).lean();
+  }
+
   await Holiday.findOneAndUpdate(
-    { course: courseId, date: day, semester: semNum },
+    { course: courseId, date: day, semester: semNum, subject: subjectId ?? null },
     {
       $set: {
         course: courseId,
         date: day,
         semester: semNum,
+        subject: subjectId ?? null,
         createdBy: userId,
         note: String(note || "").trim()
       }
@@ -91,11 +128,7 @@ export async function createHolidayForCourse({
   });
   const branchQuery = { $in: [...labels, ...labelRegexes] };
 
-  const subjects = await Subject.find({
-    course: courseId,
-    semester: semNum,
-    isActive: { $ne: false }
-  }).lean();
+  // Note: `subjects` is computed above (either single subject or all subjects).
 
   const students = await Student.find({
     branch: branchQuery,
@@ -137,12 +170,20 @@ export async function createHolidayForCourse({
 
   return {
     message:
-      "Holiday saved; attendance marked H for this branch, semester, and date",
+      subjectId
+        ? "Holiday saved; attendance marked H for selected subject, semester, and date"
+        : "Holiday saved; attendance marked H for this branch, semester, and date",
     attendanceRowsUpserted: ops.length
   };
 }
 
-export async function listHolidays({ courseId, semester, userId, userRole }) {
+export async function listHolidays({
+  courseId,
+  semester,
+  subjectId = null,
+  userId,
+  userRole
+}) {
   if (!courseId || !mongoose.isValidObjectId(String(courseId))) {
     throw new Error("courseId is required");
   }
@@ -162,7 +203,11 @@ export async function listHolidays({ courseId, semester, userId, userRole }) {
       );
     }
   }
-  return Holiday.find({ course: courseId, semester: semNum })
+  const q = { course: courseId, semester: semNum };
+  const query = subjectId
+    ? { ...q, $or: [{ subject: subjectId }, { subject: null }] }
+    : q;
+  return Holiday.find(query)
     .sort({ date: -1 })
     .populate("course", "code name")
     .lean();
@@ -172,6 +217,7 @@ export async function removeHolidayForCourse({
   courseId,
   semester,
   date,
+  subjectId = null,
   userId,
   userRole
 }) {
@@ -193,20 +239,61 @@ export async function removeHolidayForCourse({
   }
 
   const day = normalizeDayLocal(date);
-  await Holiday.deleteOne({ course: courseId, date: day, semester: semNum });
-  const subjects = await Subject.find({
-    course: courseId,
-    semester: semNum
-  })
-    .select("_id")
-    .lean();
-  const subIds = subjects.map((s) => s._id);
-  if (!subIds.length) {
-    return { message: "Holiday removed" };
+
+  if (subjectId) {
+    const courseLevelExists = await Holiday.exists({
+      course: courseId,
+      date: day,
+      semester: semNum,
+      $or: [{ subject: null }, { subject: { $exists: false } }]
+    });
+
+    if (courseLevelExists) {
+      await Holiday.deleteMany({ course: courseId, date: day, semester: semNum });
+
+      const subjects = await Subject.find({
+        course: courseId,
+        semester: semNum
+      })
+        .select("_id")
+        .lean();
+      const subIds = subjects.map((s) => s._id);
+
+      if (subIds.length) {
+        await Attendance.updateMany(
+          { subject: { $in: subIds }, date: day, status: "holiday" },
+          { $set: { status: "absent", remarks: "" } }
+        );
+      }
+    } else {
+      await Holiday.deleteOne({
+        course: courseId,
+        date: day,
+        semester: semNum,
+        subject: subjectId
+      });
+
+      await Attendance.updateMany(
+        { subject: subjectId, date: day, status: "holiday" },
+        { $set: { status: "absent", remarks: "" } }
+      );
+    }
+  } else {
+    await Holiday.deleteMany({ course: courseId, date: day, semester: semNum });
+    const subjects = await Subject.find({
+      course: courseId,
+      semester: semNum
+    })
+      .select("_id")
+      .lean();
+    const subIds = subjects.map((s) => s._id);
+    if (!subIds.length) {
+      return { message: "Holiday removed" };
+    }
+    await Attendance.updateMany(
+      { subject: { $in: subIds }, date: day, status: "holiday" },
+      { $set: { status: "absent", remarks: "" } }
+    );
   }
-  await Attendance.updateMany(
-    { subject: { $in: subIds }, date: day, status: "holiday" },
-    { $set: { status: "absent", remarks: "" } }
-  );
   return { message: "Holiday removed; attendance reset to absent" };
 }

@@ -5,10 +5,10 @@ export const createHoliday = async (payload) => {
   return data.data || data;
 };
 
-export const listHolidays = async (courseId, semester) => {
-  const { data } = await apiClient.get("/holidays", {
-    params: { courseId, semester }
-  });
+export const listHolidays = async (courseId, semester, subjectId = null) => {
+  const params = { courseId, semester };
+  if (subjectId) params.subjectId = subjectId;
+  const { data } = await apiClient.get("/holidays", { params });
   return data.data || data;
 };
 

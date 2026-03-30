@@ -7,6 +7,13 @@ const holidaySchema = new mongoose.Schema(
       ref: "Course",
       required: true
     },
+    /** Optional subject: if provided, holiday applies only to this subject. */
+    subject: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Subject",
+      required: false,
+      default: null
+    },
     /** Cohort (program semester) this holiday applies to. */
     semester: { type: Number, required: true, min: 1 },
     /** Calendar day (normalized to local midnight in service). */
@@ -20,7 +27,7 @@ const holidaySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-holidaySchema.index({ course: 1, date: 1, semester: 1 }, { unique: true });
+holidaySchema.index({ course: 1, date: 1, semester: 1, subject: 1 }, { unique: true });
 
 const Holiday = mongoose.model("Holiday", holidaySchema);
 

@@ -3,11 +3,12 @@ import * as holidayService from "./holiday.service.js";
 
 export const createHoliday = async (req, res, next) => {
   try {
-    const { courseId, semester, date, note } = req.body || {};
+    const { courseId, semester, date, note, subjectId } = req.body || {};
     const data = await holidayService.createHolidayForCourse({
       courseId,
       semester,
       date,
+      subjectId,
       userId: req.user._id,
       userRole: req.user.role,
       note
@@ -20,10 +21,11 @@ export const createHoliday = async (req, res, next) => {
 
 export const listHolidays = async (req, res, next) => {
   try {
-    const { courseId, semester } = req.query;
+    const { courseId, semester, subjectId } = req.query;
     const data = await holidayService.listHolidays({
       courseId,
       semester,
+      subjectId,
       userId: req.user._id,
       userRole: req.user.role
     });
@@ -35,11 +37,12 @@ export const listHolidays = async (req, res, next) => {
 
 export const removeHoliday = async (req, res, next) => {
   try {
-    const { courseId, semester, date } = req.body || {};
+    const { courseId, semester, date, subjectId } = req.body || {};
     const data = await holidayService.removeHolidayForCourse({
       courseId,
       semester,
       date,
+      subjectId,
       userId: req.user._id,
       userRole: req.user.role
     });

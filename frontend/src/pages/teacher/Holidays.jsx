@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { fetchBranches } from "../../api/branchApi.js";
+import { fetchSubjects } from "../../api/subjectApi.js";
 import {
   createHoliday,
   listHolidays,
@@ -19,10 +20,13 @@ const TeacherHolidays = () => {
   const [branch, setBranch] = useState("");
   const [semester, setSemester] = useState("");
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [subjectId, setSubjectId] = useState("");
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
   const [loadingList, setLoadingList] = useState(false);
   const [holidays, setHolidays] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [loadingSubjects, setLoadingSubjects] = useState(false);
   const today = new Date().toISOString().slice(0, 10);
 
   useEffect(() => {
@@ -38,7 +42,7 @@ const TeacherHolidays = () => {
   }, []);
 
   useEffect(() => {
-    if (!branch || semester === "") {
+    if (!branch || semester === "" || !subjectId) {
       setHolidays([]);
       return;
     }
@@ -46,7 +50,7 @@ const TeacherHolidays = () => {
     setLoadingList(true);
     (async () => {
       try {
-        const rows = await listHolidays(branch, semester);
+        const rows = await listHolidays(branch, semester, subjectId || null);
         if (!cancelled) setHolidays(Array.isArray(rows) ? rows : []);
       } catch {
         if (!cancelled) setHolidays([]);
@@ -57,12 +61,49 @@ const TeacherHolidays = () => {
     return () => {
       cancelled = true;
     };
+  }, [branch, semester, subjectId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoadingSubjects(true);
+      try {
+        if (!branch || semester === "") {
+          if (!cancelled) {
+            setSubjects([]);
+            setSubjectId("");
+          }
+          return;
+        }
+        const subsRaw = await fetchSubjects({
+          course: branch,
+          semester: Number(semester)
+        });
+        const list = Array.isArray(subsRaw) ? subsRaw : subsRaw?.data || [];
+        if (cancelled) return;
+        setSubjects(list);
+        setSubjectId((prev) => {
+          const stillValid = prev && list.some((s) => String(s._id) === String(prev));
+          return stillValid ? prev : list[0]?._id || "";
+        });
+      } catch {
+        if (!cancelled) {
+          setSubjects([]);
+          setSubjectId("");
+        }
+      } finally {
+        if (!cancelled) setLoadingSubjects(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [branch, semester]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!branch || semester === "" || !date) {
-      toast.error("Select branch, semester, and date.");
+    if (!branch || semester === "" || !subjectId || !date) {
+      toast.error("Select branch, semester, subject, and date.");
       return;
     }
     setSaving(true);
@@ -71,11 +112,12 @@ const TeacherHolidays = () => {
         courseId: branch,
         semester: Number(semester),
         date,
-        note: note.trim()
+        note: note.trim(),
+        subjectId
       });
       toast.success(res?.message || "Holiday saved");
       setNote("");
-      const rows = await listHolidays(branch, semester);
+      const rows = await listHolidays(branch, semester, subjectId || null);
       setHolidays(Array.isArray(rows) ? rows : []);
     } catch (err) {
       toast.error(
@@ -87,7 +129,7 @@ const TeacherHolidays = () => {
   };
 
   const handleRemove = async (holidayDate) => {
-    if (!branch || semester === "" || !holidayDate) return;
+    if (!branch || semester === "" || !subjectId || !holidayDate) return;
     const ok = window.confirm(
       "Remove this holiday? Attendance for that day will be reset to absent for affected rows in this semester."
     );
@@ -96,10 +138,11 @@ const TeacherHolidays = () => {
       await removeHoliday({
         courseId: branch,
         semester: Number(semester),
-        date: holidayDate
+        date: holidayDate,
+        subjectId
       });
       toast.success("Holiday removed");
-      const rows = await listHolidays(branch, semester);
+      const rows = await listHolidays(branch, semester, subjectId || null);
       setHolidays(Array.isArray(rows) ? rows : []);
     } catch (err) {
       toast.error(
@@ -108,7 +151,7 @@ const TeacherHolidays = () => {
     }
   };
 
-  const listReady = branch && semester !== "";
+  const listReady = Boolean(branch && semester !== "" && subjectId);
 
   return (
     <div className="space-y-5">
@@ -117,9 +160,10 @@ const TeacherHolidays = () => {
         <p className="edu-muted mt-1 text-xs">
           Choose <strong className="font-medium text-slate-800 dark:text-slate-200">branch</strong>,{" "}
           <strong className="font-medium text-slate-800 dark:text-slate-200">semester</strong>, and{" "}
+          <strong className="font-medium text-slate-800 dark:text-slate-200">subject</strong> and{" "}
           <strong className="font-medium text-slate-800 dark:text-slate-200">date</strong>. Students in
           that cohort get{" "}
-          <span className="font-semibold text-slate-800 dark:text-slate-200">H</span> for all subjects
+          <span className="font-semibold text-slate-800 dark:text-slate-200">H</span> for this subject on
           that day. Holiday rows are excluded from attendance percentage.
         </p>
       </div>
@@ -155,6 +199,28 @@ const TeacherHolidays = () => {
               </option>
             ))}
           </select>
+          <select
+            value={subjectId}
+            onChange={(e) => setSubjectId(e.target.value)}
+            required
+            disabled={!branch || semester === "" || loadingSubjects || subjects.length === 0}
+            className="edu-input disabled:opacity-60"
+          >
+            <option value="">
+              {loadingSubjects
+                ? "Loading subjects..."
+                : !branch || semester === ""
+                  ? "Select branch & semester first"
+                  : subjects.length
+                    ? "Select subject"
+                    : "No subjects found"}
+            </option>
+            {subjects.map((s) => (
+              <option key={s._id} value={s._id}>
+                {s.name} {s.code ? `(${s.code})` : ""}
+              </option>
+            ))}
+          </select>
           <input
             type="date"
             value={date}
@@ -175,7 +241,7 @@ const TeacherHolidays = () => {
         </div>
         <button
           type="submit"
-          disabled={saving || !branch || semester === ""}
+            disabled={saving || !branch || semester === "" || !subjectId}
           className="rounded-xl bg-emerald-500 px-4 py-2 text-xs font-semibold text-slate-950 shadow-md shadow-emerald-500/40 disabled:opacity-60"
         >
           {saving ? "Saving…" : "Mark as holiday"}
@@ -185,7 +251,7 @@ const TeacherHolidays = () => {
       <div className="edu-panel-deep p-4">
         <p className="text-xs font-semibold uppercase tracking-[0.15em] text-slate-600 dark:text-slate-400">
           Saved holidays{" "}
-          {!listReady ? "(select branch and semester)" : null}
+          {!listReady ? "(select branch, semester, and subject)" : null}
         </p>
         {loadingList && (
           <p className="mt-3 text-xs text-slate-500">Loading…</p>

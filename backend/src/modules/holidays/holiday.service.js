@@ -55,16 +55,6 @@ export async function createHolidayForCourse({
   if (!isAdmin) {
     teacherDoc = await Teacher.findOne({ user: userId });
     if (!teacherDoc) throw new Error("Teacher profile not found");
-    const can = await teacherCanManageCourseSemester(
-      teacherDoc._id,
-      courseId,
-      semNum
-    );
-    if (!can) {
-      throw new Error(
-        "You are not assigned to teach this branch for the selected semester"
-      );
-    }
   }
 
   let subjects;
@@ -81,17 +71,6 @@ export async function createHolidayForCourse({
       Number(s.semester) !== semNum
     ) {
       throw new Error("Subject not found for given branch and semester");
-    }
-
-    // If teacher role: also ensure they teach this exact subject.
-    if (!isAdmin && teacherDoc?.subjects?.length) {
-      const canThisSubject = teacherDoc.subjects.some((x) => {
-        const v = typeof x === "object" ? x?._id ?? x : x;
-        return String(v) === String(subjectId);
-      });
-      if (!canThisSubject) {
-        throw new Error("You are not assigned to teach this subject");
-      }
     }
     subjects = [s];
   } else {
@@ -190,18 +169,8 @@ export async function listHolidays({
   const semNum = parseSemester(semester);
   const isAdmin = userRole === "admin" || userRole === "superadmin";
   if (!isAdmin) {
-    const teacherDoc = await Teacher.findOne({ user: userId });
+    const teacherDoc = await Teacher.findOne({ user: userId }).select("_id").lean();
     if (!teacherDoc) throw new Error("Teacher profile not found");
-    const can = await teacherCanManageCourseSemester(
-      teacherDoc._id,
-      courseId,
-      semNum
-    );
-    if (!can) {
-      throw new Error(
-        "You are not assigned to teach this branch for the selected semester"
-      );
-    }
   }
   const q = { course: courseId, semester: semNum };
   const query = subjectId
@@ -224,18 +193,8 @@ export async function removeHolidayForCourse({
   const isAdmin = userRole === "admin" || userRole === "superadmin";
   const semNum = parseSemester(semester);
   if (!isAdmin) {
-    const teacherDoc = await Teacher.findOne({ user: userId });
+    const teacherDoc = await Teacher.findOne({ user: userId }).select("_id").lean();
     if (!teacherDoc) throw new Error("Teacher profile not found");
-    const can = await teacherCanManageCourseSemester(
-      teacherDoc._id,
-      courseId,
-      semNum
-    );
-    if (!can) {
-      throw new Error(
-        "You are not assigned to teach this branch for the selected semester"
-      );
-    }
   }
 
   const day = normalizeDayLocal(date);

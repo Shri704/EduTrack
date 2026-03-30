@@ -215,15 +215,13 @@ const TeacherDashboard = () => {
     e.preventDefault();
     setError("");
     setReport(null);
-    const effectiveSubjectId =
-      subject || (Array.isArray(subjects) && subjects[0]?._id ? subjects[0]._id : null);
-    if (!branch || !semester || !effectiveSubjectId) {
-      setError("Please select branch and semester (and ensure subjects exist).");
+    if (!branch || !semester || !subject) {
+      setError("Please select branch, semester, and subject.");
       return;
     }
     setLoading(true);
     try {
-      const params = { branch, semester, subject: effectiveSubjectId };
+      const params = { branch, semester, subject };
       if (startDate && endDate) {
         params.startDate = startDate;
         params.endDate = endDate;
@@ -383,6 +381,7 @@ const TeacherDashboard = () => {
               <select
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
+                required
                 className="edu-input"
               >
                 <option value="">

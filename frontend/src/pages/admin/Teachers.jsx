@@ -8,6 +8,37 @@ import {
 } from "../../api/teacherApi.js";
 import { createUser } from "../../api/userApi.js";
 
+/** Returns a user-facing message if the email is incomplete or invalid; otherwise null. */
+function getEmailFormatError(raw) {
+  const email = (raw ?? "").trim();
+  if (!email) return "Enter an email address.";
+  if (!email.includes("@")) {
+    return "This email is missing @. Use a full address like name@school.com.";
+  }
+  const parts = email.split("@");
+  if (parts.length !== 2) {
+    return "Use exactly one @ in the email (for example: name@school.com).";
+  }
+  const [local, domain] = parts;
+  if (!local) {
+    return "Add the part before @ (for example: priya in priya@school.com).";
+  }
+  if (!domain) {
+    return "Add the part after @ with a domain like gmail.com or school.edu.";
+  }
+  if (!domain.includes(".")) {
+    return "Add a domain with a dot after @ (for example .com, .in, or .edu — like school.com).";
+  }
+  const afterLastDot = domain.slice(domain.lastIndexOf(".") + 1);
+  if (!afterLastDot || afterLastDot.length < 2) {
+    return "Finish the domain after the dot (for example .com or .org).";
+  }
+  if (/\s/.test(email)) {
+    return "Remove spaces from the email address.";
+  }
+  return null;
+}
+
 const AdminTeachers = () => {
   const { user } = useSelector((state) => state.auth);
 
@@ -54,23 +85,32 @@ const AdminTeachers = () => {
 
   const handleTeacherChange = (e) => {
     const { name, value } = e.target;
+    if (name === "email" && error) setError("");
     setTeacherForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAdminChange = (e) => {
     const { name, value } = e.target;
+    if (name === "email" && adminError) setAdminError("");
     setAdminForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleTeacherSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
+    const emailErr = getEmailFormatError(teacherForm.email);
+    if (emailErr) {
+      setError(emailErr);
+      toast.error(emailErr);
+      return;
+    }
+    setLoading(true);
+    const email = teacherForm.email.trim();
     try {
       await createTeacher({
         firstName: teacherForm.firstName,
         lastName: teacherForm.lastName,
-        email: teacherForm.email,
+        email,
         department: teacherForm.department,
         password: teacherForm.password
       });
@@ -96,13 +136,20 @@ const AdminTeachers = () => {
 
   const handleAdminSubmit = async (e) => {
     e.preventDefault();
-    setAdminLoading(true);
     setAdminError("");
+    const emailErr = getEmailFormatError(adminForm.email);
+    if (emailErr) {
+      setAdminError(emailErr);
+      toast.error(emailErr);
+      return;
+    }
+    setAdminLoading(true);
+    const email = adminForm.email.trim();
     try {
       await createUser({
         firstName: adminForm.firstName,
         lastName: adminForm.lastName,
-        email: adminForm.email,
+        email,
         password: adminForm.password,
         role: "admin"
       });
@@ -178,6 +225,7 @@ const AdminTeachers = () => {
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,2fr)]">
         <div className="space-y-4">
           <form
+            noValidate
             onSubmit={handleTeacherSubmit}
             className="edu-panel-deep space-y-3 p-4 text-xs"
           >
@@ -206,7 +254,8 @@ const AdminTeachers = () => {
                 name="email"
                 value={teacherForm.email}
                 onChange={handleTeacherChange}
-                placeholder="Email"
+                placeholder="name@school.com"
+                autoComplete="email"
                 required
                 className="edu-input text-xs"
               />
@@ -239,6 +288,7 @@ const AdminTeachers = () => {
 
           {user?.role === "superadmin" && (
             <form
+              noValidate
               onSubmit={handleAdminSubmit}
               className="edu-panel-deep space-y-3 p-4 text-xs"
             >
@@ -267,7 +317,8 @@ const AdminTeachers = () => {
                   name="email"
                   value={adminForm.email}
                   onChange={handleAdminChange}
-                  placeholder="Email"
+                  placeholder="name@school.com"
+                  autoComplete="email"
                   required
                   className="edu-input text-xs"
                 />

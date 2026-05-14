@@ -1,15 +1,25 @@
+import { getEmailFormatError } from "../../utils/emailFormat.js";
+
 export const validateUser = (data) => {
+  const firstName = String(data.firstName ?? "").trim();
+  const lastName = String(data.lastName ?? "").trim();
+  const email = String(data.email ?? "").trim();
+  const password = String(data.password ?? "").trim();
 
-  if (!data.firstName || !data.lastName) {
-    throw new Error("First name and last name required");
+  if (!firstName || !lastName) {
+    throw new Error("First name and last name are required.");
   }
 
-  if (!data.email) {
-    throw new Error("Email required");
+  if (!email) {
+    throw new Error("Email is required.");
   }
 
-  if (!data.password) {
-    throw new Error("Password required");
+  const emailErr = getEmailFormatError(email);
+  if (emailErr) {
+    throw new Error(emailErr);
   }
 
+  if (!password) {
+    throw new Error("Password is required.");
+  }
 };

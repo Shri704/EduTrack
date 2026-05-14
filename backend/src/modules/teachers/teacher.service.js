@@ -1,5 +1,12 @@
 import Teacher from "./teacher.model.js";
 import User from "../users/user.model.js";
+import { getEmailFormatError } from "../../utils/emailFormat.js";
+
+const badRequest = (message) => {
+  const err = new Error(message);
+  err.statusCode = 400;
+  return err;
+};
 
 export const createTeacher = async (data) => {
   const {
@@ -13,7 +20,22 @@ export const createTeacher = async (data) => {
     experience,
     dateOfJoining
   } = data;
-  const existingUser = await User.findOne({ email });
+
+  const fn = String(firstName ?? "").trim();
+  const ln = String(lastName ?? "").trim();
+  const em = String(email ?? "").trim();
+  const dept = String(department ?? "").trim();
+  const pwd = String(password ?? "").trim();
+
+  if (!fn) throw badRequest("First name is required.");
+  if (!ln) throw badRequest("Last name is required.");
+  if (!dept) throw badRequest("Department is required.");
+  if (!pwd) throw badRequest("Temporary password is required.");
+
+  const emailErr = getEmailFormatError(em);
+  if (emailErr) throw badRequest(emailErr);
+
+  const existingUser = await User.findOne({ email: em });
   if (existingUser) throw new Error('Email already registered');
 
   const finalEmployeeId =
@@ -23,17 +45,17 @@ export const createTeacher = async (data) => {
   if (existingEmp) throw new Error("Employee ID already exists");
 
   const user = await User.create({
-    firstName,
-    lastName,
-    email,
-    password: password || "Teacher@123",
+    firstName: fn,
+    lastName: ln,
+    email: em,
+    password: pwd,
     role: "teacher",
     isVerified: true
   });
   const teacher = await Teacher.create({
     user: user._id,
     employeeId: finalEmployeeId,
-    department,
+    department: dept,
     qualification,
     experience,
     dateOfJoining

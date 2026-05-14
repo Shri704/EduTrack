@@ -7,36 +7,35 @@ import {
   deleteTeacher
 } from "../../api/teacherApi.js";
 import { createUser } from "../../api/userApi.js";
+import { getEmailFormatError } from "../../utils/emailFormat.js";
 
-/** Returns a user-facing message if the email is incomplete or invalid; otherwise null. */
-function getEmailFormatError(raw) {
-  const email = (raw ?? "").trim();
-  if (!email) return "Enter an email address.";
-  if (!email.includes("@")) {
-    return "This email is missing @. Use a full address like name@school.com.";
+function getTeacherStaffFormError(f) {
+  if (!String(f.firstName ?? "").trim()) {
+    return "Enter the teacher's first name.";
   }
-  const parts = email.split("@");
-  if (parts.length !== 2) {
-    return "Use exactly one @ in the email (for example: name@school.com).";
+  if (!String(f.lastName ?? "").trim()) {
+    return "Enter the teacher's last name.";
   }
-  const [local, domain] = parts;
-  if (!local) {
-    return "Add the part before @ (for example: priya in priya@school.com).";
+  if (!String(f.department ?? "").trim()) {
+    return "Enter a department.";
   }
-  if (!domain) {
-    return "Add the part after @ with a domain like gmail.com or school.edu.";
+  if (!String(f.password ?? "").trim()) {
+    return "Enter a temporary password.";
   }
-  if (!domain.includes(".")) {
-    return "Add a domain with a dot after @ (for example .com, .in, or .edu — like school.com).";
+  return getEmailFormatError(f.email);
+}
+
+function getAdminStaffFormError(f) {
+  if (!String(f.firstName ?? "").trim()) {
+    return "Enter the admin's first name.";
   }
-  const afterLastDot = domain.slice(domain.lastIndexOf(".") + 1);
-  if (!afterLastDot || afterLastDot.length < 2) {
-    return "Finish the domain after the dot (for example .com or .org).";
+  if (!String(f.lastName ?? "").trim()) {
+    return "Enter the admin's last name.";
   }
-  if (/\s/.test(email)) {
-    return "Remove spaces from the email address.";
+  if (!String(f.password ?? "").trim()) {
+    return "Enter a temporary password.";
   }
-  return null;
+  return getEmailFormatError(f.email);
 }
 
 const AdminTeachers = () => {
@@ -85,34 +84,34 @@ const AdminTeachers = () => {
 
   const handleTeacherChange = (e) => {
     const { name, value } = e.target;
-    if (name === "email" && error) setError("");
+    if (error) setError("");
     setTeacherForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAdminChange = (e) => {
     const { name, value } = e.target;
-    if (name === "email" && adminError) setAdminError("");
+    if (adminError) setAdminError("");
     setAdminForm((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleTeacherSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    const emailErr = getEmailFormatError(teacherForm.email);
-    if (emailErr) {
-      setError(emailErr);
-      toast.error(emailErr);
+    const teacherErr = getTeacherStaffFormError(teacherForm);
+    if (teacherErr) {
+      setError(teacherErr);
+      toast.error(teacherErr);
       return;
     }
     setLoading(true);
     const email = teacherForm.email.trim();
     try {
       await createTeacher({
-        firstName: teacherForm.firstName,
-        lastName: teacherForm.lastName,
+        firstName: teacherForm.firstName.trim(),
+        lastName: teacherForm.lastName.trim(),
         email,
-        department: teacherForm.department,
-        password: teacherForm.password
+        department: teacherForm.department.trim(),
+        password: teacherForm.password.trim()
       });
       toast.success("Teacher created");
       setTeacherForm({
@@ -137,20 +136,20 @@ const AdminTeachers = () => {
   const handleAdminSubmit = async (e) => {
     e.preventDefault();
     setAdminError("");
-    const emailErr = getEmailFormatError(adminForm.email);
-    if (emailErr) {
-      setAdminError(emailErr);
-      toast.error(emailErr);
+    const adminErr = getAdminStaffFormError(adminForm);
+    if (adminErr) {
+      setAdminError(adminErr);
+      toast.error(adminErr);
       return;
     }
     setAdminLoading(true);
     const email = adminForm.email.trim();
     try {
       await createUser({
-        firstName: adminForm.firstName,
-        lastName: adminForm.lastName,
+        firstName: adminForm.firstName.trim(),
+        lastName: adminForm.lastName.trim(),
         email,
-        password: adminForm.password,
+        password: adminForm.password.trim(),
         role: "admin"
       });
       toast.success("Admin created");

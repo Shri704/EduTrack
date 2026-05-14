@@ -5,10 +5,16 @@ export const createUser = async (req, res) => {
   try {
     validateUser(req.body);
 
-    const user = await userService.createUser(req.body);
+    const b = req.body;
+    const user = await userService.createUser({
+      ...b,
+      firstName: String(b.firstName ?? "").trim(),
+      lastName: String(b.lastName ?? "").trim(),
+      email: String(b.email ?? "").trim(),
+      password: String(b.password ?? "").trim()
+    });
 
     res.status(201).json(user);
-
   } catch (error) {
     res.status(400).json({
       message: error.message
